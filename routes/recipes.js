@@ -18,10 +18,14 @@ router.get("/", async (req, res) => {
     }
 });
 
+// GET /api/recipes/:id — получить рецепт по ID
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const recipe = await prisma.recipe.findUnique(id);
+
+        const recipe = await prisma.recipe.findUnique({
+            where: { id: Number(id) }, // если id числовой
+        });
 
         if (!recipe) {
             return res.status(404).json({ message: 'Рецепт не найден' });
