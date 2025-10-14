@@ -18,23 +18,27 @@ router.get("/", async (req, res) => {
     }
 });
 
-// GET /api/recipes/:id — получить рецепт по ID
-router.get('/:id', async (req, res) => {
+// Получение рецепта по ID
+router.get("/:id", async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = Number(req.params.id); // если id числовой
+        if (isNaN(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
 
         const recipe = await prisma.recipe.findUnique({
-            where: { id: Number(id) }, // если id числовой
+            where: { id },
+            include: { author: { select: { name: true, email: true } } },
         });
 
         if (!recipe) {
-            return res.status(404).json({ message: 'Рецепт не найден' });
+            return res.status(404).json({ message: "Recipe not found" });
         }
 
         res.json(recipe);
-    } catch (error) {
-        console.error('Ошибка при получении рецепта:', error);
-        res.status(500).json({ message: 'Ошибка сервера' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to fetch recipe" });
     }
 });
 
