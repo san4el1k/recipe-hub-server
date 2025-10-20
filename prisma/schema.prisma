@@ -41,6 +41,7 @@ model Recipe {
   updatedAt    DateTime  @updatedAt
 
   comments     Comment[]
+  likes        Like[]     // 👈 связь с лайками
 }
 
 model User {
@@ -53,4 +54,16 @@ model User {
 
   Recipe    Recipe[]
   Comment   Comment[]
+  likes     Like[]     // 👈 связь с лайками
+}
+
+model Like {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  recipeId Int
+
+  user     User   @relation(fields: [userId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+
+  @@unique([userId, recipeId]) // 👈 один лайк от пользователя на один рецепт
 }

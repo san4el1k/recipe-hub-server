@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import recipeRoutes from "./routes/recipes.js";
+import likesRoutes from "./routes/likes.js";
+import commentsRoutes from "./routes/comments.js";
 
 dotenv.config();
 const app = express();
@@ -12,6 +14,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
+app.use("/recipes/:id", likesRoutes)
+app.use("api/recipes/:id", commentsRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
