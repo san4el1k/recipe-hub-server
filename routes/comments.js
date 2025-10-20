@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // 📌 Получить все комментарии по ID рецепта
-router.get("/comments", async (req, res) => {
+router.get("/", async (req, res) => {
     const { recipeId } = req.params;
 
     try {
@@ -36,7 +36,7 @@ router.get("/comments", async (req, res) => {
 });
 
 // 📌 Получить один комментарий по ID
-router.get("/comments/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -71,7 +71,7 @@ router.get("/comments/:id", async (req, res) => {
 });
 
 // 📌 Добавить комментарий (только для авторизованных)
-router.post("/comments", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
     const { recipeId } = req.params;
     const { body } = req.body;
 
