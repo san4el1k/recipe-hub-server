@@ -73,7 +73,7 @@ router.get("/:recipeId/comments/:id", async (req, res) => {
 // 📌 Добавить комментарий (только для авторизованных)
 router.post("/:recipeId/comments", authMiddleware, async (req, res) => {
     const { recipeId } = req.params;
-    const { body } = req.body;
+    const { body, userId, name, email } = req.body;
 
     try {
         // Проверка на пустой текст комментария
@@ -84,10 +84,10 @@ router.post("/:recipeId/comments", authMiddleware, async (req, res) => {
         const newComment = await prisma.comment.create({
             data: {
                 body,
-                name: req.user.name || "Пользователь", // если хочешь имя из токена
-                email: req.user.email || "—",
+                name,
+                email,
                 recipeId: Number(recipeId),
-                userId: req.user.id, // берём ID из токена
+                userId,
             },
         });
 
