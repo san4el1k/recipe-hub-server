@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // 📌 Получить все комментарии по ID рецепта
-router.get("/", async (req, res) => {
+router.get("/:recipeId/comments", async (req, res) => {
     const { recipeId } = req.params;
 
     try {
@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
 });
 
 // 📌 Получить один комментарий по ID
-router.get("/:id", async (req, res) => {
+router.get("/:recipeId/comments/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -71,7 +71,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // 📌 Добавить комментарий (только для авторизованных)
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/:recipeId/comments", authMiddleware, async (req, res) => {
     const { recipeId } = req.params;
     const { body } = req.body;
 
@@ -99,7 +99,7 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 // 📌 Изменение комментария (только автор или админ)
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:recipeId/comments/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { body } = req.body;
 
@@ -133,7 +133,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
 
 // 📌 Удаление комментария (только автор или админ)
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:recipeId/comments/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
 
     try {
