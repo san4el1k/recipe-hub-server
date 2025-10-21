@@ -1,16 +1,42 @@
 import express from "express";
 import prisma from '../prismaClient.js';
 import { authMiddleware } from "../middlewares/authMiddleware.js";
+import {authMiddlewareOptional} from "../middlewares/authMiddlewareOptional.js";
 
 const router = express.Router();
 
-// Получение всех рецептов
-router.get("/", async (req, res) => {
+// Получение всех рецептов + количество лайков + статус "лайкнут"
+router.get("/", authMiddlewareOptional, async (req, res) => {
     try {
+        const userId = req.user?.id || null;
+
+        // 1️⃣ Получаем все рецепты с подсчётом лайков
         const recipes = await prisma.recipe.findMany({
-            include: { author: { select: { name: true, email: true } } },
+            include: {
+                author: { select: { name: true, email: true } },
+                _count: { select: { likes: true } }, // ← считает количество лайков
+            },
+            orderBy: { createdAt: "desc" },
         });
-        res.json(recipes);
+
+        // 2️⃣ Если пользователь авторизован — получаем все рецепты, которые он лайкнул
+        let likedRecipes = [];
+        if (userId) {
+            const likes = await prisma.like.findMany({
+                where: { userId, recipeId: { in: recipes.map(r => r.id) } },
+                select: { recipeId: true },
+            });
+            likedRecipes = likes.map(l => l.recipeId);
+        }
+
+        // 3️⃣ Собираем финальный ответ
+        const enriched = recipes.map(r => ({
+            ...r,
+            likesCount: r._count.likes,
+            liked: likedRecipes.includes(r.id),
+        }));
+
+        res.json(enriched);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Failed to fetch recipes" });
