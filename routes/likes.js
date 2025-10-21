@@ -1,10 +1,8 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 import {authMiddleware} from "../middlewares/authMiddleware.js";
-
+import prisma from '../prismaClient.js';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Поставить лайк
 router.post("/:id/like", authMiddleware, async (req, res) => {

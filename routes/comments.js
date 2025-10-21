@@ -1,9 +1,8 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from '../prismaClient.js';
 import {authMiddleware} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // 📌 Получить все комментарии по ID рецепта
 router.get("/:recipeId/comments", async (req, res) => {
