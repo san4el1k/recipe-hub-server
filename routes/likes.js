@@ -7,7 +7,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // Поставить лайк
-router.post("/like", authMiddleware, async (req, res) => {
+router.post("/:id/like", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const recipeId = parseInt(req.params.id);
 
@@ -27,7 +27,7 @@ router.post("/like", authMiddleware, async (req, res) => {
 });
 
 // Убрать лайк
-router.delete("/like", authMiddleware, async (req, res) => {
+router.delete("/:id/like", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const recipeId = parseInt(req.params.id);
 
@@ -49,7 +49,7 @@ router.delete("/like", authMiddleware, async (req, res) => {
 });
 
 // Проверить лайк
-router.get("/liked", authMiddleware, async (req, res) => {
+router.get("/:id/liked", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const recipeId = parseInt(req.params.id);
 
@@ -63,7 +63,7 @@ router.get("/liked", authMiddleware, async (req, res) => {
 });
 
 // Получить количество лайков
-router.get("/likes", async (req, res) => {
+router.get("/:id/likes", async (req, res) => {
     const recipeId = parseInt(req.params.id);
     const count = await prisma.like.count({ where: { recipeId } });
     res.json({ count });
