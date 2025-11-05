@@ -44,28 +44,50 @@ router.get("/", authMiddlewareOptional, async (req, res) => {
 });
 
 // Получение рецепта по ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddlewareOptional, async (req, res) => {
     try {
-        const id = Number(req.params.id); // если id числовой
+        const id = Number(req.params.id);
         if (isNaN(id)) {
             return res.status(400).json({ message: "Invalid ID" });
         }
 
+        const userId = req.user?.id || null;
+
+        // Получаем рецепт с автором и количеством лайков
         const recipe = await prisma.recipe.findUnique({
             where: { id },
-            include: { author: { select: { name: true, email: true } } },
+            include: {
+                author: { select: { name: true, email: true } },
+                _count: { select: { likes: true } },
+            },
         });
 
         if (!recipe) {
             return res.status(404).json({ message: "Recipe not found" });
         }
 
-        res.json(recipe);
+        // Проверяем, лайкнул ли пользователь рецепт
+        let liked = false;
+        if (userId) {
+            const like = await prisma.like.findFirst({
+                where: { userId, recipeId: id },
+                select: { id: true },
+            });
+            liked = !!like;
+        }
+
+        // Возвращаем тот же формат, что в списке
+        res.json({
+            ...recipe,
+            likesCount: recipe._count.likes,
+            liked,
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Failed to fetch recipe" });
     }
 });
+
 
 // Создание рецепта (только авторизованные)
 router.post("/", authMiddleware, async (req, res) => {
